@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+#  Completion for mycmd:
+#
+#
+
+function go
+{
+    cd $(mycmd "go" "$1" "$2")
+}
+
+function install
+{
+    adb install $(mycmd "install" "$1" "$2")
+}
+
+function flash
+{
+    $(mycmd "flash" "$1" "$2" "$3" "$4")
+}
+
+_go()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    first=$(mycmd "go_completion" "")
+    second=$(mycmd "go_completion" "subdir")
+ 
+    case "${prev}" in
+	go)
+            COMPREPLY=( $(compgen -W "${first}" ${cur}) )
+            return 0
+            ;;
+        *)
+	    COMPREPLY=( $(compgen -W "${second}" ${cur}) )
+            return 0
+            ;;
+    esac
+
+#    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+complete -F _go go
+
+_install()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$(mycmd "install_completion" "")
+ 
+    case "${prev}" in
+        install)
+	    COMPREPLY=( $(compgen -W "${opts}" ${cur}) )
+            return 0
+            ;;
+    esac
+}
+complete -F _install install
+
+_flash()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$(mycmd "flash_completion" "${prev}")
+ 
+    COMPREPLY=( $(compgen -W "${opts}" ${cur}) )
+}
+complete -F _flash flash

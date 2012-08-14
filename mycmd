@@ -1,0 +1,196 @@
+#!/usr/bin/python
+
+## @package mycmd
+#  easy to use my project
+#
+#  @author Holiday Hao <codediablos@gmail.com>
+#  @version 2.7.26
+
+
+import os
+import sys
+import optparse
+import ConfigParser
+
+class MYCMD:
+    HOME_DIR = os.environ["HOME"]
+    config_file = HOME_DIR + "/mycmd/.mycmd_conf"
+
+    config = ConfigParser.SafeConfigParser()
+
+    def __init__(self):
+        self.config.read(self.config_file)
+
+    def go(self, param):
+        project_home = ''
+        project_dir = ''
+        project_sub_dir = self.sub_dir(param[0], param[1])
+
+        if self.config.has_option('core', 'project_home'):
+            project_home = self.config.get('core', 'project_home')
+
+        if self.config.has_option('project', param[0]):
+            project_dir = self.config.get('project', param[0])
+
+        if project_dir == '':
+            if project_sub_dir == '':
+                result = project_home
+            else:
+                result = project_sub_dir
+        else:
+            result = project_home + "/" + project_dir + "/" + project_sub_dir
+
+        print result
+
+    def sub_dir(self, project_name, sub_name):
+        sub = ''
+	#ex. go test
+        if self.config.has_option('subdir', project_name):
+            sub = self.config.get('subdir', project_name)
+	#ex. go pm mach
+        elif self.config.has_section(sub_name + '_dir'):
+            if self.config.has_option(sub_name + '_dir', project_name):
+                sub = self.config.get(sub_name + '_dir', project_name)
+            elif self.config.has_option(sub_name + '_dir', 'default'):
+                sub = self.config.get(sub_name + '_dir', 'default')
+            else:
+                sub = ''
+	#ex. go pm i2c
+        elif self.config.has_option('subdir', sub_name):
+            sub = self.config.get('subdir', sub_name)
+        else:
+            sub = ''
+
+        return sub
+
+    def go_completion(self, param):
+        if(param[0] == 'subdir'):
+            for k, v in self.config.items('subdir'):
+                print k + " ",
+            for section in self.config.sections():
+                if not section.find('_dir') == -1:
+                    print section.replace('_dir', '')
+        else:
+            for k, v in self.config.items('project'):
+                print k + ' ',
+
+    def flash_(self, cmd, is_fused):
+        result = ''
+
+        if is_fused:
+            version = 2
+            result += '__flash_'
+            if cmd[1] == "kernel":
+                result += 'kernel.sh '
+            elif cmd[1] == "recovery":
+                result += 'recovery.sh '
+            elif cmd[1] == "bootloader":
+                result += 'bootloader.sh '
+            else:
+                result += 'all.sh '
+                version = 1
+
+            if cmd[0] == 't20':
+                result += 't20 '
+            elif cmd[0] == 't30':
+                result += 't30 '
+
+            result += self.config.get('fused', cmd[version])
+
+        else:
+            nv = './nvflash '
+            mid = '--download '
+            if cmd[0] == 't20':
+                if cmd[1] == 'kernel':
+                    mid += '7 boot.img '
+                else:
+                    mid = '--bct flash.bct --setbct --odmdata 0x100c0105 '
+                    mid += '--configfile flash.cfg --create '
+            elif cmd[0] == 't30':
+                if cmd[1] == 'kernel':
+                    mid += '9 boot.img '
+                else:
+                    mid = '--bct flash.bct --setbct --odmdata 0x40080105 '
+                    mid += '--configfile flash.cfg --create '
+            else:
+                return ''
+
+            tail = '--bl bootloader.bin --go'
+
+            result = nv + mid + tail
+
+        return result
+
+    def flash(self, param):
+        """
+        1) upzip and copy all files to download server
+        2) copy necessary images(files) to unpacked directory
+        . boot.img
+        . system.img
+        . recovery.img
+        . bootloader.bin
+        . flash.bct
+        . flash.cfg
+        . nvflash   (in out/host/linux-x86/bin)
+        . nvsbktool (in out/host/linux-x86/bin)
+        3) change files to executable mode
+        . chmod 755  *.sh nvflash nvsbktool
+        4) # For fused device:
+        . modify the SBK value in _t20_flash_all.sh or _t30_flash_all.sh
+        # e.g.: ./_t20_flash_all.sh t20 0x19ADC3AB 0xF00003D7 0x9C321B09 0x8F2FD92C
+        # For non-fused device:
+        . t20(picasso, vangogh, picassoE):       ./non_fused_t20_flash_all.sh
+        . t30(picasso M, picasso 2, picasso E2): ./non_fused_t30_flash_all.sh
+
+        ex:
+        flash t30 pmf
+        flash t30 boot pmf
+        flash fused t30 pmf
+        flash fused t30 boot pmf
+
+        """
+        cmd = ''
+        if param[0] == 'fused':
+            cmd = self.flash_(param[1:], True)
+        else:
+            cmd = self.flash_(param, False)
+
+#        print 'echo "' + cmd + '"'
+        print  cmd
+
+    def flash_completion(self, param):
+        if param[0] == 'flash':
+            print 'fused t20 t30'
+        elif param[0] == 'fused':
+            print 't20 t30'
+        elif param[0] == 't20' or param[0] == 't30':
+            for k, v in self.config.items('fused'):
+                print k + ' ',
+            print 'kernel recovery bootloader'
+        elif param[0] == 'kernel' or param[0] == 'recovery' or param[0] == 'bootloader':
+            for k, v in self.config.items('fused'):
+                print k + ' ',
+
+    def install(self, param):
+        print self.config.get('install', param[0])
+
+    def install_completion(self, param):
+        for k, v in self.config.items('install'):
+            print k + ' ',
+
+def main():
+    command = sys.argv[1]
+    param = sys.argv[2:]
+    mycmd = MYCMD()
+
+    reval = {
+        "go": lambda x: mycmd.go(x),
+        "go_completion": lambda x: mycmd.go_completion(x),
+        "install": lambda x: mycmd.install(x),
+        "install_completion": lambda x: mycmd.install_completion(x),
+        "flash": lambda x: mycmd.flash(x),
+        "flash_completion": lambda x: mycmd.flash_completion(x),
+        }[command](param)
+
+if __name__ == "__main__":
+    main()
