@@ -21,10 +21,10 @@ flash: Easy flash you device
 
 ###2. Put files in your linux  
 
-> $ cd $HOME  
+> $ cd ~  
 > $ git clone https://github.com/codediablos/mycmd.git  
 > $ source ~/.bashrc  
-> $ cp .mycmd_conf_template ~/.mycmd_conf  
+> $ cp ~/mycmd/.mycmd_conf_template ~/.mycmd_conf  
 
 ###3. Edit your mycmd config file  
 
