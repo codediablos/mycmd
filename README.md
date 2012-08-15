@@ -24,6 +24,7 @@ flash: Easy flash you device
 $ cd $HOME  
 $ git clone https://github.com/codediablos/mycmd.git  
 $ source ~/.bashrc  
+$ cp .mycmd_conf_template ~/.mycmd_conf  
 
 ###3. Set mycmd config file  
 edit .mycmd_conf  

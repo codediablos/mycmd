@@ -14,7 +14,7 @@ import ConfigParser
 
 class MYCMD:
     HOME_DIR = os.environ["HOME"]
-    config_file = HOME_DIR + "/mycmd/.mycmd_conf"
+    config_file = HOME_DIR + ".mycmd_conf"
 
     config = ConfigParser.SafeConfigParser()
 
