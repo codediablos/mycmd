@@ -4,7 +4,7 @@
 # Using "go" to project home directory
 # ex. $ go
 [core]
-project_home = /home/holiday/project/
+project_home = /home/username/project/
 
 # Setting your project directory
 [project]
@@ -52,17 +52,11 @@ a9 = kernel/arch/arm/mach-msm
 # Using "install name" to install apk in your device
 # ex. $ install log
 [install]
-i2c = /home/holiday/Share/Test-Tools/I2C_StressTest/apk/CloseJohn_v3.2_Signed.apk
-log = /home/holiday/Share/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_Unsigned.apk
-log_sign = /home/holiday/Share/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_AcerSigned.apk
-sr = /home/holiday/Share/Test-Tools/SuspendResumeTestTool/SuspendResumeTest_v3.5.Unsigned.apk
-net = /home/holiday/Share/Test-Tools/NetdumpApp_debug.apk
+i2c = /home/username/Share/Test-Tools/I2C_StressTest/apk/CloseJohn_v3.2_Signed.apk
+net = /home/username/Share/Test-Tools/NetdumpApp_debug.apk
 
 # For flash(fused)
 [fused]
 pm = 0xF5FF279B 0xF30908C1 0x63A8F8DA 0x98AFC7AA
-pmf_CCC = 0xF5C6E9A8 0x426E48BE 0xB06C7A09 0xCF07ACCC
-pmf_364 = 0x0079D5F0 0x72C14D45 0x7D1EC5BE 0x318C4364
-vg_1CD = 0x6020875E 0xB984EFE3 0x1A1AB1B3 0x868FC1CD
 vg_@87 = 0x9339020C 0x84A51889 0xA9B5B3D7 0x8E94A600
 pe2_7B1 = 0xA3AD9B60 0x6D76BA87 0xD045210E 0x0D80F7B1

@@ -17,22 +17,78 @@ flash: Easy flash you device
 >     fi  
 > fi  
 
-> export  PATH=$HOME/bin:$PATH  
+> export  PATH=$HOME/mycmd:$PATH  
 
 ###2. Put files in your linux  
 
-$ cd $HOME  
-$ git clone https://github.com/codediablos/mycmd.git  
-$ source ~/.bashrc  
-$ cp .mycmd_conf_template ~/.mycmd_conf  
+> $ cd $HOME  
+> $ git clone https://github.com/codediablos/mycmd.git  
+> $ source ~/.bashrc  
+> $ cp .mycmd_conf_template ~/.mycmd_conf  
 
-###3. Set mycmd config file  
-edit .mycmd_conf  
-open .mycmd_conf for more detail  
+###3. Edit your mycmd config file  
+
+[core]  
+project_home = /home/username/project/  <---- your project home, you can use "go"  
+
+ # Setting your project directory  
+[project]  
+a9 = ics-robin  <---- your a9 project at /home/username/project/a9, you can use "go a9"  
+pm = ics-mr1.1-pm  
+
+log = ../test_log/ <---- it can go to /home/username/project/../test_log/
+
+ # Setting your sub-directory  
+ # Using "go project sub-directory" to sub-directory  
+ # ex. $ go pm i2c  
+[subdir]  
+i2c = kernel/drivers/i2c  
+uart = kernel/drivers/tty/serial  
+eeprom = kernel/drivers/misc/eeprom  
+
+ # Setting your sub-directory for different project  
+ # First create section [xxx_dir]  
+ # Using "go project sub-directory" to sub-directory  
+ # ex. $ go project1 xxx  
+ # ex. $ go project2 xxx  
+ # You also can set default option, if you have many project with same directory  
+[out_dir]  
+a9 = out/target/product/a9  
+pm = out/target/product/picasso_m  
+pmf = out/target/product/picasso_mf  
+pre-jb-pmf = out/target/product/picasso_mf  
+pe = out/target/product/picasso_e  
+pe2 = out/target/product/picasso_e2  
+p1 = out/target/product/picasso  
+vg = out/target/product/vangogh  
+
+[mach_dir]  <---- you can use "go a9 mach", change directory to /home/username/project/a9/kernel/arch/arm/mach-msm  
+default = kernel/arch/arm/mach-tegra  
+a9 = kernel/arch/arm/mach-msm  
+
+ # adb install file  
+ # Using "install name" to install apk in your device  
+ # ex. $ install log  
+[install]  
+i2c = /home/username/Test-Tools/I2C_StressTest/apk/CloseJohn_v3.2_Signed.apk  
+log = /home/username/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_Unsigned.apk  
+
+
+ # For flash(fused)  
+ # Using "flash" to burn your device  
+ # ex. $ flash fused t30 pm
+ #     $ flash fused t30 kernel pm
+ #     $ flash t20
+ #     $ flash t30 kernel
+[fused]  
+pm = 0xF5FF279B 0xF30908C1 0x63A8F8DA 0x98AFC7AA  
+pmf_CCC = 0xF5C6E9A8 0x426E48BE 0xB06C7A09 0xCF07ACCC  
+vg_@87 = 0x9339020C 0x84A51889 0xA9B5B3D7 0x8E94A600  
+pe2_7B1 = 0xA3AD9B60 0x6D76BA87 0xD045210E 0x0D80F7B1  
 
 --------------------------------------------------------
 
-##Change Logs
+###Change Logs  
 
 version: 2.7.12  
 1. Now can using "tab" to achieve completion function  
