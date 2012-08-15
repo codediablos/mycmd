@@ -27,6 +27,7 @@ flash: Easy flash you device
 > $ cp ~/mycmd/.mycmd_conf_template ~/.mycmd_conf  
 
 ###3. Edit your mycmd config file  
+> $ mycmd --config
 
 [core]  
 project_home = /home/username/project/  <---- your project home, you can use "go"  
@@ -76,10 +77,10 @@ log = /home/username/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_Unsigned
 
  # For flash(fused)  
  # Using "flash" to burn your device  
- # ex. $ flash fused t30 pm
- #     $ flash fused t30 kernel pm
- #     $ flash t20
- #     $ flash t30 kernel
+ # ex. $ flash fused t30 pm  
+ #     $ flash fused t30 kernel pm  
+ #     $ flash t20  
+ #     $ flash t30 kernel  
 [fused]  
 pm = 0xF5FF279B 0xF30908C1 0x63A8F8DA 0x98AFC7AA  
 pmf_CCC = 0xF5C6E9A8 0x426E48BE 0xB06C7A09 0xCF07ACCC  
