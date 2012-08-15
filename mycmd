@@ -13,13 +13,23 @@ import optparse
 import ConfigParser
 
 class MYCMD:
+    DEBUG_LEVEL = 0
+
+    EDITOR = "vi"
     HOME_DIR = os.environ["HOME"]
     config_file = HOME_DIR + "/.mycmd_conf"
 
+    MSG_USAGE = "mycmd[ --config]"
+
     config = ConfigParser.SafeConfigParser()
 
-    def __init__(self):
+    def __init__(self, argv):
         self.config.read(self.config_file)
+
+        self.parser = optparse.OptionParser(self.MSG_USAGE)
+        self.parser.add_option("--debug", "-g", action="store_true", dest="debug", help="for debug",default=False)
+        self.parser.add_option("--config", action="store_true", dest="config", help="setting config file", default=False)
+        self.options, self.args = self.parser.parse_args(argv)
 
     def go(self, param):
         project_home = ''
@@ -122,40 +132,12 @@ class MYCMD:
         return result
 
     def flash(self, param):
-        """
-        1) upzip and copy all files to download server
-        2) copy necessary images(files) to unpacked directory
-        . boot.img
-        . system.img
-        . recovery.img
-        . bootloader.bin
-        . flash.bct
-        . flash.cfg
-        . nvflash   (in out/host/linux-x86/bin)
-        . nvsbktool (in out/host/linux-x86/bin)
-        3) change files to executable mode
-        . chmod 755  *.sh nvflash nvsbktool
-        4) # For fused device:
-        . modify the SBK value in _t20_flash_all.sh or _t30_flash_all.sh
-        # e.g.: ./_t20_flash_all.sh t20 0x19ADC3AB 0xF00003D7 0x9C321B09 0x8F2FD92C
-        # For non-fused device:
-        . t20(picasso, vangogh, picassoE):       ./non_fused_t20_flash_all.sh
-        . t30(picasso M, picasso 2, picasso E2): ./non_fused_t30_flash_all.sh
-
-        ex:
-        flash t30 pmf
-        flash t30 boot pmf
-        flash fused t30 pmf
-        flash fused t30 boot pmf
-
-        """
         cmd = ''
         if param[0] == 'fused':
             cmd = self.flash_(param[1:], True)
         else:
             cmd = self.flash_(param, False)
 
-#        print 'echo "' + cmd + '"'
         print  cmd
 
     def flash_completion(self, param):
@@ -178,10 +160,38 @@ class MYCMD:
         for k, v in self.config.items('install'):
             print k + ' ',
 
+    def configure(self):
+        self.open_editor(self.config_file)
+
+    def open_editor(self, edit_file):
+        try:
+            self.EDITOR = os.environ["EDITOR"]
+        except:
+            pass
+
+        self.excute_cmd(self.EDITOR + " " + edit_file, 3)
+
+    def excute_cmd(self, cmd, level):
+        if self.DEBUG_LEVEL < level:
+            os.system(cmd)
+        else:
+            print cmd
+
+    def enable_debug(self, level):
+        self.DEBUG_LEVEL = level
+
+
 def main():
     command = sys.argv[1]
     param = sys.argv[2:]
-    mycmd = MYCMD()
+    mycmd = MYCMD(sys.argv[1:])
+
+    if mycmd.options.debug:
+        mycmd.enable_debug(1)
+
+    if mycmd.options.config:
+        mycmd.configure()
+        return
 
     reval = {
         "go": lambda x: mycmd.go(x),
