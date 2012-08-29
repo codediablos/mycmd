@@ -35,18 +35,20 @@ eeprom = kernel/drivers/misc/eeprom
 # ex. $ go project2 xxx
 # You also can set default option, if you have many project with same directory
 [out_dir]
-a9 = out/target/product/a9
-pm = out/target/product/picasso_m
-pmf = out/target/product/picasso_mf
-pre-jb-pmf = out/target/product/picasso_mf
-pe = out/target/product/picasso_e
-pe2 = out/target/product/picasso_e2
-p1 = out/target/product/picasso
-vg = out/target/product/vangogh
+prefix = out/target/product
+a9 = a9
+pm = picasso_m
+pmf = picasso_mf
+pre-jb-pmf = picasso_mf
+pe = picasso_e
+pe2 = picasso_e2
+p1 = picasso
+vg = vangogh
 
 [mach_dir]
-default = kernel/arch/arm/mach-tegra
-a9 = kernel/arch/arm/mach-msm
+prefix = kernel/arch/arm/
+default = mach-tegra
+a9 = mach-msm
 
 # adb install file
 # Using "install name" to install apk in your device

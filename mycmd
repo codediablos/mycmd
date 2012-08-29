@@ -59,10 +59,14 @@ class MYCMD:
             sub = self.config.get('subdir', project_name)
 	#ex. go pm mach
         elif self.config.has_section(sub_name + '_dir'):
+            prefix = ''
+            if self.config.has_option(sub_name + '_dir', 'prefix'):
+                prefix = self.config.get(sub_name + '_dir', 'prefix') + '/'
+
             if self.config.has_option(sub_name + '_dir', project_name):
-                sub = self.config.get(sub_name + '_dir', project_name)
+                sub = prefix + self.config.get(sub_name + '_dir', project_name)
             elif self.config.has_option(sub_name + '_dir', 'default'):
-                sub = self.config.get(sub_name + '_dir', 'default')
+                sub = prefix + self.config.get(sub_name + '_dir', 'default')
             else:
                 sub = ''
 	#ex. go pm i2c
