@@ -19,6 +19,21 @@ function flash
     $(mycmd "flash" "$1" "$2" "$3" "$4")
 }
 
+function cscope-with-java
+{
+    CSCOPE_FILE=cscope.out
+    if [ -n "$1" ]; then
+	echo "Source code directory: " $1
+	echo "Create file map : " $CSCOPE_FILE
+	find $1 -name "*.h" -o -name "*.c" -o -name "*.cpp" -o -name "*.java"> $CSCOPE_FILE
+	cscope -bkq -i $CSCOPE_FILE
+	# cscope -Rbkq
+	ctags -R
+    else
+	echo "Please key-in path of project"
+    fi 
+}
+
 _go()
 {
     local cur prev opts
