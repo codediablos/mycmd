@@ -100,6 +100,8 @@ class MYCMD:
                 result += 'recovery.sh '
             elif cmd[1] == "bootloader":
                 result += 'bootloader.sh '
+            elif cmd[1] == "system":
+                result += 'system.sh '
             else:
                 result += 'all.sh '
                 version = 1
@@ -165,7 +167,7 @@ class MYCMD:
             for k, v in self.config.items('fused'):
                 print k + ' ',
             print 'kernel recovery bootloader system'
-        elif param[0] == 'kernel' or param[0] == 'recovery' or param[0] == 'bootloader':
+        elif param[0] == 'kernel' or param[0] == 'recovery' or param[0] == 'bootloader' or param[0] == 'system':
             for k, v in self.config.items('fused'):
                 print k + ' ',
 
