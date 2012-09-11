@@ -1,0 +1,23 @@
+[core]
+flash_all = sudo ./nvflash --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
+flash = sudo ./nvflash --download $target_id $target_file --bl bootloader.bin --go
+flash_fused_all = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin $$ sudo ./nvflash --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin $$ sudo ./nvflash --resume --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $bootloader bootloader_enc.bin --bl bootloader_enc.bin $$ sudo ./nvflash --resume --go
+flash_fused = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin $$ sudo ./nvflash --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $target_id $target_file --bl bootloader_enc.bin --go
+
+[t20]
+odmdata = 0x100c0105
+chip = 0x20
+bootloader = 4
+recovery = 6
+boot = 7
+system = 8
+flexrom = 11
+
+[t30]
+odmdata = 0x40080105
+chip = 0x30
+bootloader = 4
+recovery = 8
+boot = 9
+system = 10
+flexrom = 13

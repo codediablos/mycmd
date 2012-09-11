@@ -18,13 +18,16 @@ class MYCMD:
     EDITOR = "vi"
     HOME_DIR = os.environ["HOME"]
     config_file = HOME_DIR + "/.mycmd_conf"
+    patition_table_file = HOME_DIR + "/mycmd/.patition_table_conf"
 
     MSG_USAGE = "mycmd[ --config]"
 
     config = ConfigParser.SafeConfigParser()
+    patition_table = ConfigParser.SafeConfigParser()
 
     def __init__(self, argv):
         self.config.read(self.config_file)
+        self.patition_table.read(self.patition_table_file)
 
         self.parser = optparse.OptionParser(self.MSG_USAGE)
         self.parser.add_option("--debug", "-g", action="store_true", dest="debug", help="for debug",default=False)
@@ -88,64 +91,38 @@ class MYCMD:
             for k, v in self.config.items('project'):
                 print k + ' ',
 
+    def is_patition(self, pa):
+        patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
+        for patition in patitions:
+            if pa == patition:
+                return True
+        return False
+
     def flash_(self, cmd, is_fused):
         result = ''
 
         if is_fused:
-            version = 2
-            result += '__flash_'
-            if cmd[1] == "kernel":
-                result += 'kernel.sh '
-            elif cmd[1] == "recovery":
-                result += 'recovery.sh '
-            elif cmd[1] == "bootloader":
-                result += 'bootloader.sh '
-            elif cmd[1] == "system":
-                result += 'system.sh '
+            if self.is_patition(cmd[1]):
+                result = self.patition_table.get('core', 'flash_fused')
+                result = result.replace('$target_id', self.patition_table.get(cmd[0], cmd[1]))
+                result = result.replace('$target_file', cmd[1] + '.img')
+                result = result.replace('$chip', self.patition_table.get(cmd[0], 'chip'))
+                result = result.replace('$sbk', self.config.get('fused', cmd[2]))
             else:
-                result += 'all.sh '
-                version = 1
-
-            if cmd[0] == 't20':
-                result += 't20 '
-            elif cmd[0] == 't30':
-                result += 't30 '
-
-            result += self.config.get('fused', cmd[version])
+                result = self.patition_table.get('core', 'flash_fused_all')
+                result = result.replace('$odmdata', self.patition_table.get(cmd[0], 'odmdata'))
+                result = result.replace('$bootloader', self.patition_table.get(cmd[0], 'bootloader'))
+                result = result.replace('$chip', self.patition_table.get(cmd[0], 'chip'))
+                result = result.replace('$sbk', self.config.get('fused', cmd[1]))
 
         else:
-            nv = './nvflash '
-            mid = '--download '
-            if cmd[0] == 't20':
-                if cmd[1] == 'recovery':
-                    mid += '6 recovery.img '
-                elif cmd[1] == 'kernel':
-                    mid += '7 boot.img '
-                elif cmd[1] == 'system':
-                    mid += '8 system.img '
-                elif cmd[1] == 'flexrom':
-                    mid += '11 flexrom.img '
-                else:
-                    mid = '--bct flash.bct --setbct --odmdata 0x100c0105 '
-                    mid += '--configfile flash.cfg --create '
-            elif cmd[0] == 't30':
-                if cmd[1] == 'recovery':
-                    mid += '8 recovery.img '
-                elif cmd[1] == 'kernel':
-                    mid += '9 boot.img '
-                elif cmd[1] == 'system':
-                    mid += '10 system.img '
-                elif cmd[1] == 'flexrom':
-                    mid += '13 flexrom.img '
-                else:
-                    mid = '--bct flash.bct --setbct --odmdata 0x40080105 '
-                    mid += '--configfile flash.cfg --create '
+            if self.is_patition(cmd[1]):
+                result = self.patition_table.get('core', 'flash')
+                result = result.replace('$target_id', self.patition_table.get(cmd[0], cmd[1]))
+                result = result.replace('$target_file', cmd[1] + '.img')
             else:
-                return ''
-
-            tail = '--bl bootloader.bin --go'
-
-            result = nv + mid + tail
+                result = self.patition_table.get('core', 'flash_all')
+                result = result.replace('$odmdata', self.patition_table.get(cmd[0], 'odmdata'))
 
         return result
 
@@ -156,7 +133,9 @@ class MYCMD:
         else:
             cmd = self.flash_(param, False)
 
-        print  cmd
+        for line in cmd.split('$$ '):
+            print line
+            os.system(line)
 
     def flash_completion(self, param):
         if param[0] == 'flash':
@@ -166,8 +145,8 @@ class MYCMD:
         elif param[0] == 't20' or param[0] == 't30':
             for k, v in self.config.items('fused'):
                 print k + ' ',
-            print 'kernel recovery bootloader system'
-        elif param[0] == 'kernel' or param[0] == 'recovery' or param[0] == 'bootloader' or param[0] == 'system':
+            print 'boot recovery bootloader system'
+        elif self.is_patition(param[0]):
             for k, v in self.config.items('fused'):
                 print k + ' ',
 
