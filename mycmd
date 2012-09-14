@@ -100,29 +100,32 @@ class MYCMD:
 
     def flash_(self, cmd, is_fused):
         result = ''
+        cmd_type = 'flash'
+        chip = cmd[0]
+        patition = cmd[1]
+        sbk = cmd[2]
 
+        # get command
         if is_fused:
-            if self.is_patition(cmd[1]):
-                result = self.patition_table.get('core', 'flash_fused')
-                result = result.replace('$target_id', self.patition_table.get(cmd[0], cmd[1]))
-                result = result.replace('$target_file', cmd[1] + '.img')
-                result = result.replace('$chip', self.patition_table.get(cmd[0], 'chip'))
-                result = result.replace('$sbk', self.config.get('fused', cmd[2]))
-            else:
-                result = self.patition_table.get('core', 'flash_fused_all')
-                result = result.replace('$odmdata', self.patition_table.get(cmd[0], 'odmdata'))
-                result = result.replace('$bootloader', self.patition_table.get(cmd[0], 'bootloader'))
-                result = result.replace('$chip', self.patition_table.get(cmd[0], 'chip'))
-                result = result.replace('$sbk', self.config.get('fused', cmd[1]))
+            cmd_type += '_fused'
 
-        else:
-            if self.is_patition(cmd[1]):
-                result = self.patition_table.get('core', 'flash')
-                result = result.replace('$target_id', self.patition_table.get(cmd[0], cmd[1]))
-                result = result.replace('$target_file', cmd[1] + '.img')
-            else:
-                result = self.patition_table.get('core', 'flash_all')
-                result = result.replace('$odmdata', self.patition_table.get(cmd[0], 'odmdata'))
+        if not self.is_patition(patition):
+            cmd_type += '_all'
+            sbk = cmd[1]
+
+        result = self.patition_table.get('core', cmd_type)
+
+        # replace variable
+        if is_fused:
+            result = result.replace('$sbk', self.config.get('fused', sbk))
+
+        if self.is_patition(patition):
+            result = result.replace('$target_id', self.patition_table.get(chip, patition))
+            result = result.replace('$target_file', patition + '.img')
+
+        for k, v in self.patition_table.items(chip):
+            # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
+            result = result.replace('$'+ k + ' ', v + ' ')
 
         return result
 
@@ -135,7 +138,7 @@ class MYCMD:
 
         for line in cmd.split('$$ '):
             print line
-            os.system(line)
+            self.excute_cmd(line, 1)
 
     def flash_completion(self, param):
         if param[0] == 'flash':
