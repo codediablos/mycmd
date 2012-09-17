@@ -121,7 +121,10 @@ class MYCMD:
 
         if self.is_patition(patition):
             result = result.replace('$target_id', self.patition_table.get(chip, patition))
-            result = result.replace('$target_file', patition + '.img')
+            if patition == 'bootloader':
+                result = result.replace('$target_file', patition + '_enc.bin')
+            else:
+                result = result.replace('$target_file', patition + '.img')
 
         for k, v in self.patition_table.items(chip):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
