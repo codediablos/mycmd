@@ -10,17 +10,10 @@ project_home = /home/username/project/
 [project]
 a9 = ics-robin
 pm = ics-mr1.1-pm
-pmf = jb-pmf
-pre-jb-pmf = pre-jb-pmf
-pe = ics-mr1-t20
-pe2 = jb-pe2
-p1 = ics-mr1-p1
-vg = ics-mr1-vg
 
-test = ../Share/Test-Tools/
 log = ../test_log/
 
-# Setting your sub-directory 
+# Setting your sub-directory
 # Using "go project sub-directory" to sub-directory
 # ex. $ go pm i2c
 [subdir]
@@ -32,7 +25,6 @@ eeprom = kernel/drivers/misc/eeprom
 # First create section [xxx_dir]
 # Using "go project sub-directory" to sub-directory
 # ex. $ go project1 xxx
-# ex. $ go project2 xxx
 # You also can set default option, if you have many project with same directory
 [out_dir]
 prefix = out/target/product
@@ -46,7 +38,7 @@ p1 = picasso
 vg = vangogh
 
 [mach_dir]
-prefix = kernel/arch/arm/
+prefix = kernel/arch/arm
 default = mach-tegra
 a9 = mach-msm
 
@@ -54,11 +46,17 @@ a9 = mach-msm
 # Using "install name" to install apk in your device
 # ex. $ install log
 [install]
-i2c = /home/username/Share/Test-Tools/I2C_StressTest/apk/CloseJohn_v3.2_Signed.apk
-net = /home/username/Share/Test-Tools/NetdumpApp_debug.apk
+i2c = /home/username/Test-Tools/I2C_StressTest/apk/CloseJohn_v3.2_Signed.apk
+log = /home/username/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_Unsigned.apk
 
-# For flash(fused)
+# For flash
+# Using "flash" to burn your device
+# ex. $ flash fused t30 pm
+# $ flash fused t30 boot pm
+# $ flash t20
+# $ flash t30 system
 [fused]
 pm = 0xF5FF279B 0xF30908C1 0x63A8F8DA 0x98AFC7AA
-vg_@87 = 0x9339020C 0x84A51889 0xA9B5B3D7 0x8E94A600
+pmfCCC = 0xF5C6E9A8 0x426E48BE 0xB06C7A09 0xCF07ACCC
+vg@87 = 0x9339020C 0x84A51889 0xA9B5B3D7 0x8E94A600
 pe2_7B1 = 0xA3AD9B60 0x6D76BA87 0xD045210E 0x0D80F7B1
