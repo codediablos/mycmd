@@ -15,23 +15,25 @@ import ConfigParser
 class MYCMD:
     DEBUG_LEVEL = 0
 
-    EDITOR = "vi"
-    HOME_DIR = os.environ["HOME"]
-    config_file = HOME_DIR + "/.mycmd_conf"
-    patition_table_file = HOME_DIR + "/mycmd/.patition_table_conf"
+    EDITOR = 'vi'
+    HOME_DIR = os.environ['HOME']
+    config_file = HOME_DIR + '/.mycmd_conf'
+    patition_table_file = HOME_DIR + '/mycmd/.patition_table_conf'
 
     MSG_USAGE = "mycmd[ --config]"
 
     config = ConfigParser.SafeConfigParser()
     patition_table = ConfigParser.SafeConfigParser()
 
+    patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
+
     def __init__(self, argv):
         self.config.read(self.config_file)
         self.patition_table.read(self.patition_table_file)
 
         self.parser = optparse.OptionParser(self.MSG_USAGE)
-        self.parser.add_option("--debug", "-g", action="store_true", dest="debug", help="for debug",default=False)
-        self.parser.add_option("--config", action="store_true", dest="config", help="setting config file", default=False)
+        self.parser.add_option('--debug', '-g', action='store_true', dest='debug', help="for debug",default=False)
+        self.parser.add_option('--config', action='store_true', dest='config', help="setting config file", default=False)
         self.options, self.args = self.parser.parse_args(argv)
 
     def go(self, param):
@@ -64,7 +66,7 @@ class MYCMD:
         elif self.config.has_section(sub_name + '_dir'):
             prefix = ''
             if self.config.has_option(sub_name + '_dir', 'prefix'):
-                prefix = self.config.get(sub_name + '_dir', 'prefix') + '/'
+                prefix = self.config.get(sub_name + '_dir', 'prefix') + "/"
 
             if self.config.has_option(sub_name + '_dir', project_name):
                 sub = prefix + self.config.get(sub_name + '_dir', project_name)
@@ -83,22 +85,21 @@ class MYCMD:
     def go_completion(self, param):
         if(param[0] == 'subdir'):
             for k, v in self.config.items('subdir'):
-                print k + " ",
+                print k
             for section in self.config.sections():
                 if not section.find('_dir') == -1:
                     print section.replace('_dir', '')
         else:
             for k, v in self.config.items('project'):
-                print k + ' ',
+                print k
 
-    def is_patition(self, pa):
-        patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
-        for patition in patitions:
-            if pa == patition:
+    def is_patition(self, part):
+        for patition in self.patitions:
+            if part == patition:
                 return True
         return False
 
-    def flash_(self, cmd, is_fused):
+    def flash_cmd(self, cmd, is_fused):
         result = ''
         cmd_type = 'flash'
         chip = cmd[0]
@@ -117,29 +118,29 @@ class MYCMD:
 
         # replace variable
         if is_fused:
-            result = result.replace('$sbk', self.config.get('fused', sbk))
+            result = result.replace("$sbk", self.config.get("fused", sbk))
 
         if self.is_patition(patition):
-            result = result.replace('$target_id', self.patition_table.get(chip, patition))
+            result = result.replace("$target_id", self.patition_table.get(chip, patition))
             if patition == 'bootloader':
-                result = result.replace('$target_file', patition + '_enc.bin')
+                result = result.replace("$target_file", patition + "_enc.bin")
             else:
-                result = result.replace('$target_file', patition + '.img')
+                result = result.replace("$target_file", patition + ".img")
 
         for k, v in self.patition_table.items(chip):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
-            result = result.replace('$'+ k + ' ', v + ' ')
+            result = result.replace("$"+ k + " ", v + " ")
 
         return result
 
     def flash(self, param):
         cmd = ''
         if param[0] == 'fused':
-            cmd = self.flash_(param[1:], True)
+            cmd = self.flash_cmd(param[1:], True)
         else:
-            cmd = self.flash_(param, False)
+            cmd = self.flash_cmd(param, False)
 
-        for line in cmd.split('$$ '):
+        for line in cmd.split("$$ "):
             print line
             self.excute_cmd(line, 1)
 
@@ -150,25 +151,26 @@ class MYCMD:
             print 't20 t30'
         elif param[0] == 't20' or param[0] == 't30':
             for k, v in self.config.items('fused'):
-                print k + ' ',
-            print 'boot recovery bootloader system'
+                print k
+            for patition in self.patitions:
+                print patition
         elif self.is_patition(param[0]):
             for k, v in self.config.items('fused'):
-                print k + ' ',
+                print k
 
     def install(self, param):
         print self.config.get('install', param[0])
 
     def install_completion(self, param):
         for k, v in self.config.items('install'):
-            print k + ' ',
+            print k
 
     def configure(self):
         self.open_editor(self.config_file)
 
     def open_editor(self, edit_file):
         try:
-            self.EDITOR = os.environ["EDITOR"]
+            self.EDITOR = os.environ['EDITOR']
         except:
             pass
 
@@ -197,13 +199,13 @@ def main():
         return
 
     reval = {
-        "go": lambda x: mycmd.go(x),
-        "go_completion": lambda x: mycmd.go_completion(x),
-        "install": lambda x: mycmd.install(x),
-        "install_completion": lambda x: mycmd.install_completion(x),
-        "flash": lambda x: mycmd.flash(x),
-        "flash_completion": lambda x: mycmd.flash_completion(x),
+        'go': lambda x: mycmd.go(x),
+        'go_completion': lambda x: mycmd.go_completion(x),
+        'install': lambda x: mycmd.install(x),
+        'install_completion': lambda x: mycmd.install_completion(x),
+        'flash': lambda x: mycmd.flash(x),
+        'flash_completion': lambda x: mycmd.flash_completion(x),
         }[command](param)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
