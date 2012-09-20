@@ -1,10 +1,25 @@
 [core]
-flash_all = sudo ./nvflash --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
-flash = sudo ./nvflash --download $target_id $target_file --bl bootloader.bin --go
-flash_fused_all = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin $$ sudo ./nvflash --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin $$ sudo ./nvflash --resume --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $bootloader bootloader_enc.bin --bl bootloader_enc.bin $$ sudo ./nvflash --resume --go
-flash_fused = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin $$ sudo ./nvflash --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $target_id $target_file --bl bootloader_enc.bin --go
+flash_nv_all = sudo ./nvflash --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
+flash_nv = sudo ./nvflash --download $target_id $target_file --bl bootloader.bin --go
+flash_nv_fused_all = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin
+		$$ sudo ./nvflash --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin
+		$$ sudo ./nvflash --resume --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $bootloader bootloader_enc.bin --bl bootloader_enc.bin
+		$$ sudo ./nvflash --resume --go
+flash_nv_fused = sudo ./nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin
+	    $$ sudo ./nvflash --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $target_id $target_file --bl bootloader_enc.bin --go
+flash_qcom_all = fastboot flash aboot emmc_appsboot.mbn
+	       $$ fastboot flash boot boot.img
+	       $$ fastboot flash recovery recovery.img
+	       $$ fastboot flash system system.img
+	       $$ fastboot flash cache cache.img
+	       $$ fastboot flash userdata userdata.img
+	       $$ fastboot flash tombstones tombstones.img
+	       $$ fastboot flash persist persist.img
+	       $$ fastboot reboot
+flash_qcom = fastboot flash $patition $patition_img
 
 [t20]
+platform = nv
 odmdata = 0x100c0105
 chip = 0x20
 bootloader = 4
@@ -14,6 +29,7 @@ system = 8
 flexrom = 11
 
 [t30]
+platform = nv
 odmdata = 0x40080105
 chip = 0x30
 bootloader = 4
@@ -21,3 +37,14 @@ recovery = 8
 boot = 9
 system = 10
 flexrom = 13
+
+[a9]
+platform = qcom
+aboot = emmc_appsboot.mbn
+boot = boot.img
+recovery = recovery.img
+system = system.img
+cache = cache.img
+userdata = userdata.img
+tombstones = tombstones.img
+persist = persist.img

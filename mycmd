@@ -102,11 +102,16 @@ class MYCMD:
     def flash_cmd(self, cmd, is_fused):
         result = ''
         cmd_type = 'flash'
-        chip = cmd[0]
+        platform = cmd[0]
         patition = cmd[1]
         sbk = cmd[2]
 
         # get command
+        if self.patition_table.get(platform, 'platform') == 'qcom':
+            cmd_type += '_qcom'
+        else:
+            cmd_type += '_nv'
+            
         if is_fused:
             cmd_type += '_fused'
 
@@ -121,13 +126,13 @@ class MYCMD:
             result = result.replace("$sbk", self.config.get("fused", sbk))
 
         if self.is_patition(patition):
-            result = result.replace("$target_id", self.patition_table.get(chip, patition))
+            result = result.replace("$target_id", self.patition_table.get(platform, patition))
             if patition == 'bootloader':
                 result = result.replace("$target_file", patition + "_enc.bin")
             else:
                 result = result.replace("$target_file", patition + ".img")
 
-        for k, v in self.patition_table.items(chip):
+        for k, v in self.patition_table.items(platform):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
             result = result.replace("$"+ k + " ", v + " ")
 
