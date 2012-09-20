@@ -25,7 +25,8 @@ class MYCMD:
     config = ConfigParser.SafeConfigParser()
     patition_table = ConfigParser.SafeConfigParser()
 
-    patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
+    nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
+    qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist']
 
     def __init__(self, argv):
         self.config.read(self.config_file)
@@ -93,8 +94,14 @@ class MYCMD:
             for k, v in self.config.items('project'):
                 print k
 
-    def is_patition(self, part):
-        for patition in self.patitions:
+    def is_qcom_patition(self, part):
+        for patition in self.qcom_patitions:
+            if part == patition:
+                return True
+        return False
+
+    def is_nv_patition(self, part):
+        for patition in self.nv_patitions:
             if part == patition:
                 return True
         return False
@@ -109,13 +116,15 @@ class MYCMD:
         # get command
         if self.patition_table.get(platform, 'platform') == 'qcom':
             cmd_type += '_qcom'
+            if patition == 'modem':
+                cmd_type += '_modem'
         else:
             cmd_type += '_nv'
             
         if is_fused:
             cmd_type += '_fused'
 
-        if not self.is_patition(patition):
+        if not self.is_nv_patition(patition) and not self.is_qcom_patition(patition):
             cmd_type += '_all'
             sbk = cmd[1]
 
@@ -125,12 +134,16 @@ class MYCMD:
         if is_fused:
             result = result.replace("$sbk", self.config.get("fused", sbk))
 
-        if self.is_patition(patition):
+        if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
             result = result.replace("$target_id", self.patition_table.get(platform, patition))
             if patition == 'bootloader':
                 result = result.replace("$target_file", patition + "_enc.bin")
             else:
                 result = result.replace("$target_file", patition + ".img")
+
+        if self.is_qcom_patition(patition) and self.patition_table.get(platform, 'platform') == 'qcom':
+            result = result.replace("$patition_img", self.patition_table.get(platform, patition))
+            result = result.replace("$patition", patition)
 
         for k, v in self.patition_table.items(platform):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
@@ -151,15 +164,18 @@ class MYCMD:
 
     def flash_completion(self, param):
         if param[0] == 'flash':
-            print 'fused t20 t30'
+            print 'fused t20 t30 a9'
         elif param[0] == 'fused':
             print 't20 t30'
+        elif param[0] == 'a9':
+            for patition in self.qcom_patitions:
+                print patition
         elif param[0] == 't20' or param[0] == 't30':
             for k, v in self.config.items('fused'):
                 print k
-            for patition in self.patitions:
+            for patition in self.nv_patitions:
                 print patition
-        elif self.is_patition(param[0]):
+        elif self.is_nv_patition(param[0]):
             for k, v in self.config.items('fused'):
                 print k
 
