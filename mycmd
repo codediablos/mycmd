@@ -170,6 +170,7 @@ class MYCMD:
         elif param[0] == 'a9':
             for patition in self.qcom_patitions:
                 print patition
+            print 'modem'
         elif param[0] == 't20' or param[0] == 't30':
             for k, v in self.config.items('fused'):
                 print k
