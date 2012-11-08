@@ -132,8 +132,9 @@ class MYCMD:
 
         # replace variable
         if is_fused:
-            result = result.replace("$sbk", self.config.get("fused", sbk))
+            result = result.replace("$sbk", self.config.get('fused', sbk))
 
+        result = result.replace("$nvflash_location", self.patition_table.get('core', 'nvflash_location'))
         if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
             result = result.replace("$target_id", self.patition_table.get(platform, patition))
             if patition == 'bootloader':
@@ -164,14 +165,14 @@ class MYCMD:
 
     def flash_completion(self, param):
         if param[0] == 'flash':
-            print 'fused t20 t30 a9'
+            print 'fused t20 t30 t40 a9'
         elif param[0] == 'fused':
-            print 't20 t30'
+            print 't20 t30 t40'
         elif param[0] == 'a9':
             for patition in self.qcom_patitions:
                 print patition
             print 'modem'
-        elif param[0] == 't20' or param[0] == 't30':
+        elif param[0] == 't20' or param[0] == 't30' or param[0] == 't40':
             for k, v in self.config.items('fused'):
                 print k
             for patition in self.nv_patitions:
