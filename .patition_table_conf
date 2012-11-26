@@ -1,13 +1,13 @@
 [core]
-nvflash_location = ../../../host/linux-x86/bin
-flash_nv_all = sudo $nvflash_location/nvflash --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
-flash_nv = sudo $nvflash_location/nvflash --download $target_id $target_file --bl bootloader.bin --go
+nvflash_location = ../../../host/linux-x86/bin/nvflash
+flash_nv_all = sudo $nvflash_location --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
+flash_nv = sudo $nvflash_location --download $target_id $target_file --bl bootloader.bin --go
 flash_nv_fused_all = sudo $nvflash_location/nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin
-		$$ sudo $nvflash_location/nvflash --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin
-		$$ sudo $nvflash_location/nvflash --resume --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $bootloader bootloader_enc.bin --bl bootloader_enc.bin
-		$$ sudo $nvflash_location/nvflash --resume --go
+		$$ sudo $nvflash_location --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin
+		$$ sudo $nvflash_location --resume --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $bootloader bootloader_enc.bin --bl bootloader_enc.bin
+		$$ sudo $nvflash_location --resume --go
 flash_nv_fused = sudo $nvflash_location/nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin
-	    $$ sudo $nvflash_location/nvflash --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $target_id $target_file --bl bootloader_enc.bin --go
+	    $$ sudo $nvflash_location --blob blob.bin --setblhash flash_enc.bct --configfile flash.cfg --download $target_id $target_file --bl bootloader_enc.bin --go
 flash_qcom_all = fastboot flash aboot emmc_appsboot.mbn
 	       $$ fastboot flash boot boot.img
 	       $$ fastboot flash recovery recovery.img

@@ -134,7 +134,10 @@ class MYCMD:
         if is_fused:
             result = result.replace("$sbk", self.config.get('fused', sbk))
 
-        result = result.replace("$nvflash_location", self.patition_table.get('core', 'nvflash_location'))
+        nvflash = self.patition_table.get('core', 'nvflash_location')
+        if not os.path.isfile(nvflash):
+            nvflash = './nvflash'
+        result = result.replace("$nvflash_location", nvflash)
         if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
             result = result.replace("$target_id", self.patition_table.get(platform, patition))
             if patition == 'bootloader':
