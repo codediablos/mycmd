@@ -25,6 +25,7 @@ class MYCMD:
     config = ConfigParser.SafeConfigParser()
     patition_table = ConfigParser.SafeConfigParser()
 
+    correct_platforms = ['t20', 't30', 't40', 'a9']
     nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
     qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist']
 
@@ -120,7 +121,7 @@ class MYCMD:
                 cmd_type += '_modem'
         else:
             cmd_type += '_nv'
-            
+
         if is_fused:
             cmd_type += '_fused'
 
@@ -134,10 +135,12 @@ class MYCMD:
         if is_fused:
             result = result.replace("$sbk", self.config.get('fused', sbk))
 
+        # check nvflash is exist
         nvflash = self.patition_table.get('core', 'nvflash_location')
         if not os.path.isfile(nvflash):
             nvflash = './nvflash'
         result = result.replace("$nvflash_location", nvflash)
+
         if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
             result = result.replace("$target_id", self.patition_table.get(platform, patition))
             if patition == 'bootloader':
@@ -157,8 +160,8 @@ class MYCMD:
 
     def flash(self, param):
         cmd = ''
-        if param[0] == 'fused':
-            cmd = self.flash_cmd(param[1:], True)
+        if self.check_fused(param):
+            cmd = self.flash_cmd(param, True)
         else:
             cmd = self.flash_cmd(param, False)
 
@@ -168,9 +171,8 @@ class MYCMD:
 
     def flash_completion(self, param):
         if param[0] == 'flash':
-            print 'fused t20 t30 t40 a9'
-        elif param[0] == 'fused':
-            print 't20 t30 t40'
+            for platform in self.correct_platforms:
+                print platform
         elif param[0] == 'a9':
             for patition in self.qcom_patitions:
                 print patition
@@ -183,6 +185,22 @@ class MYCMD:
         elif self.is_nv_patition(param[0]):
             for k, v in self.config.items('fused'):
                 print k
+
+    def check_fused(self, params):
+        last_input = 0
+        x = range(len(params))
+        x.reverse()
+        for i in x:
+            if not params[i] == '':
+                last_input = i
+                break
+
+        check_list = self.correct_platforms
+        check_list.append(self.nv_patitions)
+        for check in check_list:
+            if params[last_input] == check:
+                return False
+        return True;
 
     def install(self, param):
         print self.config.get('install', param[0])
