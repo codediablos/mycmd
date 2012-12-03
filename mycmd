@@ -107,6 +107,12 @@ class MYCMD:
                 return True
         return False
 
+    def is_platfrom(self, plat):
+        for platform in self.correct_platforms:
+            if plat == platform:
+                return True
+        return False
+
     def flash_cmd(self, cmd, is_fused):
         result = ''
         cmd_type = 'flash'
@@ -136,10 +142,10 @@ class MYCMD:
             result = result.replace("$sbk", self.config.get('fused', sbk))
 
         # check nvflash is exist
-        nvflash = self.patition_table.get('core', 'nvflash_location')
-        if not os.path.isfile(nvflash):
-            nvflash = './nvflash'
-        result = result.replace("$nvflash_location", nvflash)
+        nvflash_location = self.patition_table.get('core', 'nvflash_location')
+        if not os.path.isfile(nvflash_location + '/nvflash'):
+            nvflash_location = './'
+        result = result.replace("$nvflash_location", nvflash_location)
 
         if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
             result = result.replace("$target_id", self.patition_table.get(platform, patition))
@@ -191,15 +197,13 @@ class MYCMD:
         x = range(len(params))
         x.reverse()
         for i in x:
-            if not params[i] == '':
+            if not params[i] == '' and not params[i] == ' ':
                 last_input = i
                 break
 
-        check_list = self.correct_platforms
-        check_list.append(self.nv_patitions)
-        for check in check_list:
-            if params[last_input] == check:
-                return False
+        if self.is_platfrom(params[last_input]) or self.is_nv_patition(params[last_input]):
+            return False
+
         return True;
 
     def install(self, param):
