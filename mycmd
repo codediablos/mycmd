@@ -155,7 +155,10 @@ class MYCMD:
                 result = result.replace("$target_file", patition + ".img")
 
         if self.is_qcom_patition(patition) and self.patition_table.get(platform, 'platform') == 'qcom':
-            result = result.replace("$patition_img", self.patition_table.get(platform, patition))
+            if patition == 'aboot':
+                result = result.replace("$patition_img", "emmc_appsboot.mbn")
+            else:
+                result = result.replace("$patition_img", self.patition_table.get(platform, patition))
             result = result.replace("$patition", patition)
 
         for k, v in self.patition_table.items(platform):
@@ -201,7 +204,9 @@ class MYCMD:
                 last_input = i
                 break
 
-        if self.is_platfrom(params[last_input]) or self.is_nv_patition(params[last_input]):
+        if self.is_platfrom(params[last_input]) or \
+                self.is_nv_patition(params[last_input]) or \
+                self.is_qcom_patition(params[last_input]):
             return False
 
         return True;
