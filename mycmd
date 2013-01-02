@@ -206,7 +206,8 @@ class MYCMD:
 
         if self.is_platfrom(params[last_input]) or \
                 self.is_nv_patition(params[last_input]) or \
-                self.is_qcom_patition(params[last_input]):
+                self.is_qcom_patition(params[last_input]) or \
+                params[last_input] == 'modem':
             return False
 
         return True;
