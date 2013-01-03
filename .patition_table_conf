@@ -16,17 +16,14 @@ flash_qcom_all = fastboot flash aboot emmc_appsboot.mbn
 	       $$ fastboot flash userdata userdata.img
 	       $$ fastboot flash tombstones tombstones.img
 	       $$ fastboot flash persist persist.img
-	       $$ fastboot reboot
-flash_qcom_modem_all = fastboot flash partition pt/gpt_both0.bin
+flash_qcom_modem = fastboot flash partition pt/gpt_both0.bin
 		 $$ fastboot flash sbl1 sbl1.mbn
 		 $$ fastboot flash sbl2 sbl2.mbn
 		 $$ fastboot flash sbl3 sbl3.mbn
 		 $$ fastboot flash tz tz.mbn
 		 $$ fastboot flash rpm rpm.mbn
 		 $$ fastboot flash modem NON-HLOS.bin
-		 $$ fastboot reboot
 flash_qcom = fastboot flash $patition $patition_img
-	   $$ fastboot reboot
 
 [t20]
 platform = nv

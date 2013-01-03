@@ -27,7 +27,7 @@ class MYCMD:
 
     correct_platforms = ['t20', 't30', 't40', 'a9']
     nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
-    qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist']
+    qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist', 'modem']
 
     def __init__(self, argv):
         self.config.read(self.config_file)
@@ -144,7 +144,7 @@ class MYCMD:
         # check nvflash is exist
         nvflash_location = self.patition_table.get('core', 'nvflash_location')
         if not os.path.isfile(nvflash_location + '/nvflash'):
-            nvflash_location = './'
+            nvflash_location = '.'
         result = result.replace("$nvflash_location", nvflash_location)
 
         if self.is_nv_patition(patition) and self.patition_table.get(platform, 'platform') == 'nv':
@@ -155,7 +155,9 @@ class MYCMD:
                 result = result.replace("$target_file", patition + ".img")
 
         if self.is_qcom_patition(patition) and self.patition_table.get(platform, 'platform') == 'qcom':
-            if patition == 'aboot':
+            if patition == 'modem':
+                pass
+            elif patition == 'aboot':
                 result = result.replace("$patition_img", "emmc_appsboot.mbn")
             else:
                 result = result.replace("$patition_img", self.patition_table.get(platform, patition))
@@ -163,20 +165,26 @@ class MYCMD:
 
         for k, v in self.patition_table.items(platform):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
-            result = result.replace("$"+ k + " ", v + " ")
+            result = result.replace("$" + k + " ", v + " ")
 
         return result
 
-    def flash(self, param):
+    def flash(self, params):
         cmd = ''
-        if self.check_fused(param):
-            cmd = self.flash_cmd(param, True)
+        platform = params[0]
+        if self.check_fused(params):
+            cmd = self.flash_cmd(params, True)
         else:
-            cmd = self.flash_cmd(param, False)
+            cmd = self.flash_cmd(params, False)
 
         for line in cmd.split("$$ "):
             print line
             self.excute_cmd(line, 1)
+
+        if(self.patition_table.get(platform, 'platform') == 'qcom'):
+            input = raw_input("Do you want to reboot? (Y/n): ")
+            if not input == 'N' and not input == 'n':
+                self.excute_cmd("fastboot reboot", 1)
 
     def flash_completion(self, param):
         if param[0] == 'flash':
@@ -185,7 +193,6 @@ class MYCMD:
         elif param[0] == 'a9':
             for patition in self.qcom_patitions:
                 print patition
-            print 'modem'
         elif param[0] == 't20' or param[0] == 't30' or param[0] == 't40':
             for k, v in self.config.items('fused'):
                 print k
@@ -206,8 +213,7 @@ class MYCMD:
 
         if self.is_platfrom(params[last_input]) or \
                 self.is_nv_patition(params[last_input]) or \
-                self.is_qcom_patition(params[last_input]) or \
-                params[last_input] == 'modem':
+                self.is_qcom_patition(params[last_input]):
             return False
 
         return True;
@@ -242,8 +248,7 @@ class MYCMD:
 
 def main():
     command = sys.argv[1]
-    param = sys.argv[2:]
-    mycmd = MYCMD(sys.argv[1:])
+    mycmd = MYCMD(sys.argv[2:])
 
     if mycmd.options.debug:
         mycmd.enable_debug(1)
@@ -259,7 +264,7 @@ def main():
         'install_completion': lambda x: mycmd.install_completion(x),
         'flash': lambda x: mycmd.flash(x),
         'flash_completion': lambda x: mycmd.flash_completion(x),
-        }[command](param)
+        }[command](mycmd.args)
 
 if __name__ == '__main__':
     main()
