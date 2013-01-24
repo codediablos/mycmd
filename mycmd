@@ -9,11 +9,18 @@
 
 import os
 import sys
+import time
+import threading
 import optparse
 import ConfigParser
 
+
+finish = False
+input_data = 'none'
+
 class MYCMD:
     DEBUG_LEVEL = 0
+    TIMEOUT = 10
 
     EDITOR = 'vi'
     HOME_DIR = os.environ['HOME']
@@ -182,9 +189,17 @@ class MYCMD:
             self.excute_cmd(line, 1)
 
         if(self.patition_table.get(platform, 'platform') == 'qcom'):
-            input = raw_input("Do you want to reboot? (Y/n): ")
-            if not input == 'N' and not input == 'n':
-                self.excute_cmd("fastboot reboot", 1)
+            t1 = threading.Thread(target=message, args=(self.TIMEOUT,))
+            t2 = threading.Thread(target=input_fun)
+            t1.start()
+            t2.start()
+            while True:
+                if finish or not input_data == 'none':
+                    if not input_data == 'N' and not input_data == 'n':
+                        self.excute_cmd("fastboot reboot", 1)
+                    t1._Thread__stop()
+                    t2._Thread__stop()
+                    break
 
     def flash_completion(self, param):
         if param[0] == 'flash':
@@ -245,6 +260,19 @@ class MYCMD:
     def enable_debug(self, level):
         self.DEBUG_LEVEL = level
 
+def message(num):
+    global finish
+    global input_data
+    for i in range(num - 1, -1, -1):
+        sys.stdout.write('\rDo you want to reboot? [reboot after %ds] (Y/n):' % i)
+        sys.stdout.flush()
+        time.sleep(1)
+    sys.stdout.write('\n')
+    finish = True
+
+def input_fun():
+    global input_data
+    input_data = raw_input()
 
 def main():
     command = sys.argv[1]
