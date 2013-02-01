@@ -32,7 +32,8 @@ class MYCMD:
     config = ConfigParser.SafeConfigParser()
     patition_table = ConfigParser.SafeConfigParser()
 
-    correct_platforms = ['t20', 't30', 't40', 'a9']
+    nv_platforms = []
+    qcom_platforms = []
     nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
     qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist', 'modem']
 
@@ -44,6 +45,14 @@ class MYCMD:
         self.parser.add_option('--debug', '-g', action='store_true', dest='debug', help="for debug",default=False)
         self.parser.add_option('--config', action='store_true', dest='config', help="setting config file", default=False)
         self.options, self.args = self.parser.parse_args(argv)
+
+        for platform in self.patition_table.sections():
+            if not platform == 'core':
+                user_value = self.patition_table.get(platform, 'platform')
+                if user_value == 'nv':
+                    self.nv_platforms.append(platform)
+                elif user_value == 'qcom':
+                    self.qcom_platforms.append(platform)
 
     def go(self, param):
         project_home = ''
@@ -115,7 +124,18 @@ class MYCMD:
         return False
 
     def is_platfrom(self, plat):
-        for platform in self.correct_platforms:
+        if self.is_qcom_platform(plat) or self.is_nv_platform(plat):
+                return True
+        return False
+
+    def is_qcom_platform(self, plat):
+        for platform in self.qcom_platforms:
+            if plat == platform:
+                return True
+        return False
+
+    def is_nv_platform(self, plat):
+        for platform in self.nv_platforms:
             if plat == platform:
                 return True
         return False
@@ -203,12 +223,14 @@ class MYCMD:
 
     def flash_completion(self, param):
         if param[0] == 'flash':
-            for platform in self.correct_platforms:
+            for platform in self.nv_platforms:
                 print platform
-        elif param[0] == 'a9':
+            for platform in self.qcom_platforms:
+                print platform
+        elif self.is_qcom_platform(param[0]):
             for patition in self.qcom_patitions:
                 print patition
-        elif param[0] == 't20' or param[0] == 't30' or param[0] == 't40':
+        elif self.is_nv_platform(param[0]):
             for k, v in self.config.items('fused'):
                 print k
             for patition in self.nv_patitions:

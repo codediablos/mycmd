@@ -54,6 +54,17 @@ recovery = 8
 boot = 9
 system = 10
 
+[qcom]
+platform = qcom
+aboot = emmc_appsboot.mbn
+boot = boot.img
+recovery = recovery.img
+system = system.img
+cache = cache.img
+userdata = userdata.img
+tombstones = tombstones.img
+persist = persist.img
+
 [a9]
 platform = qcom
 aboot = emmc_appsboot.mbn
