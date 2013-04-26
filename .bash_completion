@@ -31,7 +31,22 @@ function cscope-with-java-mk
 	ctags -R
     else
 	echo "Please key-in path of project"
-    fi 
+    fi
+}
+
+function cscope-with-java-mk-xml
+{
+    CSCOPE_FILE=cscope.out
+    if [ -n "$1" ]; then
+	echo "Source code directory: " $1
+	echo "Create file map : " $CSCOPE_FILE
+	find $1 -name "*.h" -o -name "*.c" -o -name "*.cpp" -o -name "*.java" -o -name "*.mk" -o -name "Makefile" -o -name "Kconfig" -o -name "*.xml"> $CSCOPE_FILE
+	cscope -bkq -i $CSCOPE_FILE
+	# cscope -Rbkq
+	ctags -R
+    else
+	echo "Please key-in path of project"
+    fi
 }
 
 function cscope-with-java-mk-dts
@@ -57,7 +72,7 @@ _go()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     first=$(mycmd "go_completion" "")
     second=$(mycmd "go_completion" "subdir")
- 
+
     case "${prev}" in
 	go)
             COMPREPLY=( $(compgen -W "${first}" ${cur}) )
@@ -80,7 +95,7 @@ _install()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(mycmd "install_completion" "")
- 
+
     case "${prev}" in
         install)
 	    COMPREPLY=( $(compgen -W "${opts}" ${cur}) )
@@ -97,7 +112,7 @@ _flash()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(mycmd "flash_completion" "${prev}")
- 
+
     COMPREPLY=( $(compgen -W "${opts}" ${cur}) )
 }
 complete -F _flash flash
