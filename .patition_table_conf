@@ -63,6 +63,15 @@ recovery = 8
 boot = 9
 system = 10
 
+[ta2]
+platform = nv
+odmdata = 0x4009A600
+chip = 0x40
+bootloader = 4
+recovery = 8
+boot = 9
+system = 10
+
 [qcom]
 platform = qcom
 aboot = emmc_appsboot.mbn
