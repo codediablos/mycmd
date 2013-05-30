@@ -211,6 +211,8 @@ class MYCMD:
         if(self.patition_table.get(platform, 'platform') == 'qcom'):
             t1 = threading.Thread(target=message, args=(self.TIMEOUT,))
             t2 = threading.Thread(target=input_fun)
+            t1.setDaemon(True)
+            t2.setDaemon(True)
             t1.start()
             t2.start()
             while True:
