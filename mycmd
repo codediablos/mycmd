@@ -38,6 +38,7 @@ class MYCMD:
     qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist', 'modem']
 
     def __init__(self, argv):
+        """Do initial. Read config file, set parser option and get patition table from config file"""
         self.config.read(self.config_file)
         self.patition_table.read(self.patition_table_file)
 
@@ -55,6 +56,7 @@ class MYCMD:
                     self.qcom_platforms.append(platform)
 
     def go(self, param):
+        """Do go command"""
         project_home = ''
         project_dir = ''
         project_sub_dir = self.sub_dir(param[0], param[1])
@@ -76,10 +78,19 @@ class MYCMD:
         print result
 
     def sub_dir(self, project_name, sub_name):
+        """Return subdir path
+
+        Keyword arguments:
+        project_name -- the project name
+        sub_name -- the subdir name
+
+        """
         sub = ''
+        #This project is a path
 	#ex. go test
         if self.config.has_option('subdir', project_name):
             sub = self.config.get('subdir', project_name)
+        #Every project with Different path
 	#ex. go pm mach
         elif self.config.has_section(sub_name + '_dir'):
             prefix = ''
@@ -92,6 +103,7 @@ class MYCMD:
                 sub = prefix + self.config.get(sub_name + '_dir', 'default')
             else:
                 sub = ''
+        #Every project with Same path
 	#ex. go pm i2c
         elif self.config.has_option('subdir', sub_name):
             sub = self.config.get('subdir', sub_name)
@@ -101,6 +113,7 @@ class MYCMD:
         return sub
 
     def go_completion(self, param):
+        """For bash completion (using tab)"""
         if(param[0] == 'subdir'):
             for k, v in self.config.items('subdir'):
                 print k
@@ -112,42 +125,48 @@ class MYCMD:
                 print k
 
     def is_qcom_patition(self, part):
+        """Check part is qcom patition or not"""
         for patition in self.qcom_patitions:
             if part == patition:
                 return True
         return False
 
     def is_nv_patition(self, part):
+        """Check part is nv patition or not"""
         for patition in self.nv_patitions:
             if part == patition:
                 return True
         return False
 
     def is_platfrom(self, plat):
+        """Check plat is qcmd & nv platform or not"""
         if self.is_qcom_platform(plat) or self.is_nv_platform(plat):
                 return True
         return False
 
     def is_qcom_platform(self, plat):
+        """Check plat is qcmd platform or not"""
         for platform in self.qcom_platforms:
             if plat == platform:
                 return True
         return False
 
     def is_nv_platform(self, plat):
+        """Check plat is nv platform or not"""
         for platform in self.nv_platforms:
             if plat == platform:
                 return True
         return False
 
     def flash_cmd(self, cmd, is_fused):
+        """Parse flash command and return the path"""
         result = ''
         cmd_type = 'flash'
         platform = cmd[0]
         patition = cmd[1]
         sbk = cmd[2]
 
-        # get command
+        #Get command
         if self.patition_table.get(platform, 'platform') == 'qcom':
             cmd_type += '_qcom'
             if patition == 'modem':
@@ -164,11 +183,11 @@ class MYCMD:
 
         result = self.patition_table.get('core', cmd_type)
 
-        # replace variable
+        #Replace variable
         if is_fused:
             result = result.replace("$sbk", self.config.get('fused', sbk))
 
-        # check nvflash is exist
+        #Check nvflash is exist
         nvflash_location = self.patition_table.get('core', 'nvflash_location')
         if not os.path.isfile(nvflash_location + '/nvflash'):
             nvflash_location = '.'
@@ -197,6 +216,7 @@ class MYCMD:
         return result
 
     def flash(self, params):
+        """Do flash command"""
         cmd = ''
         platform = params[0]
         if self.check_fused(params):
@@ -208,6 +228,7 @@ class MYCMD:
             print line
             self.excute_cmd(line, 1)
 
+        # If using qcom flatform, running countdown message
         if(self.patition_table.get(platform, 'platform') == 'qcom'):
             t1 = threading.Thread(target=message, args=(self.TIMEOUT,))
             t2 = threading.Thread(target=input_fun)
@@ -224,6 +245,7 @@ class MYCMD:
                     break
 
     def flash_completion(self, param):
+        """For bash completion (using tab)"""
         if param[0] == 'flash':
             for platform in self.nv_platforms:
                 print platform
@@ -242,6 +264,7 @@ class MYCMD:
                 print k
 
     def check_fused(self, params):
+        """Check command is fused or not"""
         last_input = 0
         x = range(len(params))
         x.reverse()
@@ -258,16 +281,21 @@ class MYCMD:
         return True;
 
     def install(self, param):
+        """Do install command by config file"""
         print self.config.get('install', param[0])
 
     def install_completion(self, param):
+        """For bash completion (using tab)"""
+        # Search config file items [install]
         for k, v in self.config.items('install'):
             print k
 
     def configure(self):
+        """Open config file"""
         self.open_editor(self.config_file)
 
     def open_editor(self, edit_file):
+        """Open config file use default editor"""
         try:
             self.EDITOR = os.environ['EDITOR']
         except:
@@ -276,15 +304,18 @@ class MYCMD:
         self.excute_cmd(self.EDITOR + " " + edit_file, 3)
 
     def excute_cmd(self, cmd, level):
+        """Excute commnad or not excute only print command by level"""
         if self.DEBUG_LEVEL < level:
             os.system(cmd)
         else:
             print cmd
 
     def enable_debug(self, level):
+        """Set debug level"""
         self.DEBUG_LEVEL = level
 
 def message(num):
+    """Print countdown message with num second"""
     global finish
     global input_data
     for i in range(num - 1, -1, -1):
@@ -295,10 +326,12 @@ def message(num):
     finish = True
 
 def input_fun():
+    """Get input data"""
     global input_data
     input_data = raw_input()
 
 def main():
+    """Parse input command and run the command"""
     command = sys.argv[1]
     mycmd = MYCMD(sys.argv[2:])
 
