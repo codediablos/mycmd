@@ -3,8 +3,8 @@
 ##Introduction:  
 
 go: Easy change your directory  
-install: Easy install apk file  
-flash: Easy flash you device  
+install: Easy install your file  
+flash: Easy flash your device  
 
 ##How to Use:  
 
@@ -79,8 +79,8 @@ log = /home/username/Test-Tools/AcerLogSetting_V3.9/AcerLogSetting_v3.9_Unsigned
 
  # For flash  
  # Using "flash" to burn your device  
- # ex. $ flash fused t30 pm  
- #     $ flash fused t30 boot pm  
+ # ex. $ flash t30 pm  
+ #     $ flash t30 boot pm  
  #     $ flash t20  
  #     $ flash t30 system  
 [fused]  
