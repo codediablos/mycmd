@@ -171,11 +171,13 @@ class MYCMD:
             cmd_type += '_qcom'
             if patition == 'modem':
                 cmd_type += '_modem'
-        else:
+        elif self.patition_table.get(platform, 'platform') == 'nv':
             cmd_type += '_nv'
-
-        if is_fused:
-            cmd_type += '_fused'
+            if is_fused:
+                if int(self.patition_table.get(platform, 'chip'), 16) > 0x30 :
+                    cmd_type += '_fused40'
+                else :
+                    cmd_type += '_fused'
 
         if not self.is_nv_patition(patition) and not self.is_qcom_patition(patition):
             cmd_type += '_all'
