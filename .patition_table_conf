@@ -30,6 +30,16 @@ flash_qcom_modem = fastboot flash partition pt/gpt_both0.bin
 		 $$ fastboot flash modem NON-HLOS.bin
 flash_qcom = fastboot flash $patition $patition_img
 
+flash_intel_all = fastboot -s Medfield66CBDF6C flash fastboot droidboot.img
+	    $$ fastboot -s Medfield66CBDF6C flash recovery recovery.img
+	    $$ fastboot -s Medfield66CBDF6C erase cache
+	    $$ fastboot -s Medfield66CBDF6C erase system
+	    $$ fastboot -s Medfield66CBDF6C erase data
+	    $$ fastboot -s Medfield66CBDF6C flash system system.img.gz
+	    $$ fastboot -s Medfield66CBDF6C flash data userdata.img
+	    $$ fastboot -s Medfield66CBDF6C flash boot boot.bin
+flash_intel = fastboot -s Medfield66CBDF6C flash $patition $patition_img
+
 [t20]
 platform = nv
 odmdata = 0x100c0105
@@ -98,3 +108,12 @@ cache = cache.img
 userdata = userdata.img
 tombstones = tombstones.img
 persist = persist.img
+
+[intel]
+platform = intel
+bootloader = droidboot.img
+recovery = recovery.img
+system = system.img.gz
+data = userdata.img
+boot = boot.bin
+

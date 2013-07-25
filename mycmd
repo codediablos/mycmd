@@ -34,8 +34,10 @@ class MYCMD:
 
     nv_platforms = []
     qcom_platforms = []
+    intel_platforms = []
     nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
     qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist', 'modem']
+    intel_patitions = ['bootloader', 'boot', 'recovery', 'system', 'data']
 
     def __init__(self, argv):
         """Do initial. Read config file, set parser option and get patition table from config file"""
@@ -54,6 +56,8 @@ class MYCMD:
                     self.nv_platforms.append(platform)
                 elif user_value == 'qcom':
                     self.qcom_platforms.append(platform)
+                elif user_value == 'intel':
+                    self.intel_platforms.append(platform)
 
     def go(self, param):
         """Do go command"""
@@ -138,9 +142,17 @@ class MYCMD:
                 return True
         return False
 
+    def is_intel_patition(self, part):
+        """Check part is intel patition or not"""
+        for patition in self.intel_patitions:
+            if part == patition:
+                return True
+        return False
+
     def is_platfrom(self, plat):
         """Check plat is qcmd & nv platform or not"""
-        if self.is_qcom_platform(plat) or self.is_nv_platform(plat):
+        if self.is_qcom_platform(plat) or self.is_nv_platform(plat) or \
+                self.is_intel_platform(plat):
                 return True
         return False
 
@@ -154,6 +166,13 @@ class MYCMD:
     def is_nv_platform(self, plat):
         """Check plat is nv platform or not"""
         for platform in self.nv_platforms:
+            if plat == platform:
+                return True
+        return False
+
+    def is_intel_platform(self, plat):
+        """Check plat is nv platform or not"""
+        for platform in self.intel_platforms:
             if plat == platform:
                 return True
         return False
@@ -178,8 +197,11 @@ class MYCMD:
                     cmd_type += '_fused40'
                 else :
                     cmd_type += '_fused'
+        elif self.patition_table.get(platform, 'platform') == 'intel':
+            cmd_type += '_intel'
 
-        if not self.is_nv_patition(patition) and not self.is_qcom_patition(patition):
+        if not self.is_nv_patition(patition) and not self.is_qcom_patition(patition) and \
+                not self.is_intel_patition(patition):
             cmd_type += '_all'
             sbk = cmd[1]
 
@@ -211,6 +233,10 @@ class MYCMD:
                 result = result.replace("$patition_img", self.patition_table.get(platform, patition))
             result = result.replace("$patition", patition)
 
+        if self.is_intel_patition(patition) and self.patition_table.get(platform, 'platform') == 'intel':
+            result = result.replace("$patition_img", self.patition_table.get(platform, patition))
+            result = result.replace("$patition", patition)
+
         for k, v in self.patition_table.items(platform):
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
             result = result.replace("$" + k + " ", v + " ")
@@ -231,7 +257,8 @@ class MYCMD:
             self.excute_cmd(line, 1)
 
         # If using qcom flatform, running countdown message
-        if(self.patition_table.get(platform, 'platform') == 'qcom'):
+        if(self.patition_table.get(platform, 'platform') == 'qcom' or \
+           self.patition_table.get(platform, 'platform') == 'intel'):
             t1 = threading.Thread(target=message, args=(self.TIMEOUT,))
             t2 = threading.Thread(target=input_fun)
             t1.setDaemon(True)
@@ -253,8 +280,13 @@ class MYCMD:
                 print platform
             for platform in self.qcom_platforms:
                 print platform
+            for platform in self.intel_platforms:
+                print platform
         elif self.is_qcom_platform(param[0]):
             for patition in self.qcom_patitions:
+                print patition
+        elif self.is_intel_platform(param[0]):
+            for patition in self.intel_patitions:
                 print patition
         elif self.is_nv_platform(param[0]):
             for k, v in self.config.items('fused'):
@@ -277,7 +309,8 @@ class MYCMD:
 
         if self.is_platfrom(params[last_input]) or \
                 self.is_nv_patition(params[last_input]) or \
-                self.is_qcom_patition(params[last_input]):
+                self.is_qcom_patition(params[last_input]) or \
+                self.is_intel_patition(params[last_input]):
             return False
 
         return True;
