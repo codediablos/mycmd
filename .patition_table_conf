@@ -30,15 +30,15 @@ flash_qcom_modem = fastboot flash partition pt/gpt_both0.bin
 		 $$ fastboot flash modem NON-HLOS.bin
 flash_qcom = fastboot flash $patition $patition_img
 
-flash_intel_all = fastboot -s Medfield66CBDF6C flash fastboot droidboot.img
-	    $$ fastboot -s Medfield66CBDF6C flash recovery recovery.img
-	    $$ fastboot -s Medfield66CBDF6C erase cache
-	    $$ fastboot -s Medfield66CBDF6C erase system
-	    $$ fastboot -s Medfield66CBDF6C erase data
-	    $$ fastboot -s Medfield66CBDF6C flash system system.img.gz
-	    $$ fastboot -s Medfield66CBDF6C flash data userdata.img
-	    $$ fastboot -s Medfield66CBDF6C flash boot boot.bin
-flash_intel = fastboot -s Medfield66CBDF6C flash $patition $patition_img
+flash_intel_all = fastboot flash fastboot droidboot.img
+	    $$ fastboot flash recovery recovery.img
+	    $$ fastboot erase cache
+	    $$ fastboot erase system
+	    $$ fastboot erase data
+	    $$ fastboot flash system system.img.gz
+	    $$ fastboot flash data userdata.img
+	    $$ fastboot flash boot boot.bin
+flash_intel = fastboot flash $patition $patition_img
 
 [t20]
 platform = nv
