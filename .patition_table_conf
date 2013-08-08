@@ -32,12 +32,13 @@ flash_qcom = fastboot flash $patition $patition_img
 
 flash_intel_all = fastboot flash fastboot droidboot.img
 	    $$ fastboot flash recovery recovery.img
+	    $$ cp ../../../../vendor/intel/fw/PRIVATE/ulpmc/ULPMC_FW_PR1.bin .
+	    $$ fastboot flash ulpmc ULPMC_FW_PR1.bin
 	    $$ fastboot erase cache
 	    $$ fastboot erase system
 	    $$ fastboot erase data
 	    $$ fastboot flash system system.img.gz
-	    $$ fastboot flash data userdata.img
-	    $$ fastboot flash boot boot.bin
+	    $$ fastboot flash boot boot.img
 flash_intel = fastboot flash $patition $patition_img
 
 [t20]
@@ -115,5 +116,5 @@ bootloader = droidboot.img
 recovery = recovery.img
 system = system.img.gz
 data = userdata.img
-boot = boot.bin
-
+boot = boot.img
+ulpmc = ULPMC_FW_PR1.bin
