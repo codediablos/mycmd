@@ -37,7 +37,7 @@ flash_intel_all = fastboot flash fastboot droidboot.img
 	    $$ fastboot erase cache
 	    $$ fastboot erase system
 	    $$ fastboot erase data
-	    $$ fastboot flash system system.img.gz
+	    $$ fastboot flash system system.img
 	    $$ fastboot flash boot boot.img
 flash_intel_partition = fastboot oem start_partitioning 
 	    $$ fastboot flash /tmp/partition.tbl partition.tbl
@@ -125,7 +125,7 @@ persist = persist.img
 platform = intel
 bootloader = droidboot.img
 recovery = recovery.img
-system = system.img.gz
+system = system.img
 data = userdata.img
 boot = boot.img
 ulpmc = ULPMC_FW_PR1.bin
