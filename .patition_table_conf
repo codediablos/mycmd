@@ -37,7 +37,7 @@ flash_intel_all = fastboot flash fastboot droidboot.img
 	    $$ fastboot erase cache
 	    $$ fastboot erase system
 	    $$ fastboot erase data
-	    $$ fastboot flash system system.img
+	    $$ fastboot -S 100M flash system system.img
 	    $$ fastboot flash boot boot.img
 flash_intel_partition = fastboot oem start_partitioning 
 	    $$ fastboot flash /tmp/partition.tbl partition.tbl
@@ -50,7 +50,7 @@ flash_intel_erase = fastboot erase factory
 	    $$ fastboot erase logs
 	    $$ fastboot erase spare
 	    $$ fastboot erase data
-flash_intel = fastboot flash $patition $patition_img
+flash_intel = fastboot -S 100M flash $patition $patition_img
 
 [t20]
 platform = nv
