@@ -248,6 +248,10 @@ class MYCMD:
             # result.replace('$odmdata', self.patition_table.get(patition, 'odmdata'))
             result = result.replace("$" + k + " ", v + " ")
 
+        # other replace string
+        if self.patition_table.get(platform, 'platform') == 'nv' and self.patition_table.has_option(platform, 'flash.bct'):
+            result = result.replace("flash.bct", self.patition_table.get(platform, 'flash.bct'))
+
         return result
 
     def flash(self, params):

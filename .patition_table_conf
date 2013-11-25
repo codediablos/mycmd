@@ -1,6 +1,6 @@
 [core]
 nvflash_location = ../../../host/linux-x86/bin
-flash_nv_all = sudo $nvflash_location/nvflash --bct flash.bct --setbct --odmdata $odmdata --configfile flash.cfg --create --bl bootloader.bin --go
+flash_nv_all = sudo $nvflash_location/nvflash --bct flash.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader.bin --go
 flash_nv = sudo $nvflash_location/nvflash --download $target_id $target_file --bl bootloader.bin --go
 flash_nv_fused_all = sudo $nvflash_location/nvsbktool --sbk $sbk --chip $chip --bct flash.bct flash_enc.bct --bl bootloader.bin bootloader_enc.bin
 		$$ sudo $nvflash_location/nvflash --blob blob.bin --bct flash_enc.bct --setbct --configfile flash.cfg --create --odmdata $odmdata --bl bootloader_enc.bin
@@ -98,6 +98,16 @@ bootloader = 4
 recovery = 8
 boot = 9
 system = 10
+
+[prada]
+platform = nv
+odmdata = 0x80098000
+chip = 0x35
+bootloader = 4
+recovery = 9
+boot = 10
+system = 11
+flash.bct = flash_bct.cfg
 
 [qcom]
 platform = qcom
