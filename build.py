@@ -31,6 +31,7 @@ class Build:
         self.parser.add_option('-n', action='store_true', dest='new', help="New build", default=False)
         self.parser.add_option('-r', action='store_true', dest='remake', help="Remake", default=False)
         self.parser.add_option('-k', action='store_true', dest='kernel', help="Build kernel", default=False)
+        self.parser.add_option('-l', action='store_true', dest='list', help="List project", default=False)
         self.parser.add_option('--system', action='store_true', dest='android', help="Build kernel", default=False)
         self.parser.add_option('--sign', action='store_true', dest='sign', help="Sign image", default=False)
         self.parser.add_option('--debug', '-g', action='store_true', dest='debug', help="For debug",default=False)
@@ -118,7 +119,11 @@ class Build:
 
 def main():
     build = Build(sys.argv)
-    build.run()
+
+    if build.options.list:
+        build.execute(['./makeMtk listp'])
+    else:
+        build.run()
 
 if __name__ == '__main__':
     main()
