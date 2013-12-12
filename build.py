@@ -74,7 +74,7 @@ class Build:
             cmd += self.options.project + ' '
             self.config.set('core', 'project', self.options.project)
         elif self.config.has_option('core', 'project'):
-            cmd += self.ver + self.config.get('core', 'project') + ' '
+            cmd += self.config.get('core', 'project') + ' '
 
         if self.options.clean:
             self.add_action('c')
