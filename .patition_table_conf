@@ -43,7 +43,11 @@ flash_intel_partition = fastboot oem start_partitioning
 	    $$ fastboot flash /tmp/partition.tbl partition.tbl
 	    $$ fastboot oem partition /tmp/partition.tbl
 	    $$ fastboot oem stop_partitioning
+flash_intel_osip = fastboot oem write_osip_header
+flash_intel_droidboot = fastboot boot droidboot.img
+	    $$ fastboot continue
 flash_intel_erase = fastboot erase factory
+	    $$ fastboot erase misc
 	    $$ fastboot erase cache
 	    $$ fastboot erase system
 	    $$ fastboot erase config
