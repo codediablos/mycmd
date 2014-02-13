@@ -95,11 +95,10 @@ class Build:
             flag2 += 'systemimage'
             commands.append(cmd + self.get_actions() + flag)
             commands.append(cmd + flag2)
+        elif self.options.sign:
+            commands.append(cmd + 'sign-image')
         else:
             commands.append(cmd + self.get_actions() + flag)
-
-        if self.options.sign:
-            commands.append(cmd + 'sign-image')
 
 
         file = open(self.config_file, 'w')
