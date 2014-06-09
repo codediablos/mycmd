@@ -37,7 +37,7 @@ class MYCMD:
     intel_platforms = []
     nv_patitions = ['boot', 'bootloader', 'recovery', 'system', 'flexrom']
     qcom_patitions = ['aboot', 'boot', 'recovery', 'system', 'cache', 'userdata', 'tombstones', 'persist', 'modem']
-    intel_patitions = ['bootloader', 'boot', 'recovery', 'system', 'data', 'partition', 'erase', 'osip', 'droidboot']
+    intel_patitions = ['bootloader', 'boot', 'recovery', 'system', 'data', 'partition', 'erase', 'osip', 'droidboot', 'efi']
 
     def __init__(self, argv):
         """Do initial. Read config file, set parser option and get patition table from config file"""
@@ -207,6 +207,8 @@ class MYCMD:
                 cmd_type += '_osip'
             elif patition == 'droidboot':
                 cmd_type += '_droidboot'
+            elif patition == 'efi':
+                cmd_type += '_efi'
 
         if not self.is_nv_patition(patition) and not self.is_qcom_patition(patition) and \
                 not self.is_intel_patition(patition):
@@ -242,7 +244,7 @@ class MYCMD:
             result = result.replace("$patition", patition)
 
         if self.is_intel_patition(patition) and self.patition_table.get(platform, 'platform') == 'intel':
-            if patition == 'partition' or patition == 'erase' or patition == 'osip' or patition == 'droidboot':
+            if patition == 'partition' or patition == 'erase' or patition == 'osip' or patition == 'droidboot' or patition == 'efi':
                 pass
             else :
                 result = result.replace("$patition_img", self.patition_table.get(platform, patition))
