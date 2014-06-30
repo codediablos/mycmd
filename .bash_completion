@@ -64,6 +64,21 @@ function cscope-with-java-mk-dts
     fi
 }
 
+function cscope-with-python-mk
+{
+    CSCOPE_FILE=cscope.out
+    if [ -n "$1" ]; then
+	echo "Source code directory: " $1
+	echo "Create file map : " $CSCOPE_FILE
+	find $1 -name "*.py" -o -name "*.mk" -o -name "Makefile" > $CSCOPE_FILE
+	cscope -bkq -i $CSCOPE_FILE
+	# cscope -Rbkq
+	ctags -R
+    else
+	echo "Please key-in path of project"
+    fi
+}
+
 _go()
 {
     local cur prev opts
